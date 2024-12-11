@@ -1,0 +1,30 @@
+name: Main build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependecies GRPC
+        run: |
+          sudo apt install -y build-essential autoconf libtool pkg-config git cmake
+          sudo apt install -y libc++-dev libc++abi-dev
+          sudo bash ./install_dependencies.sh
+
+      - name: Build with CMake
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make

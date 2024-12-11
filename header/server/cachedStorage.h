@@ -27,10 +27,10 @@ class CachedStorage
         }
         ReturnStatus registerUser(const User& usr) 
         {
-            if(!isEmail(usr.email)
+            if(!isEmail(usr.email))
             {
                 return Status_ValidationFailed;
-            })
+            }
             size_t emailHash = hasher(usr.email);
             if(users.find(emailHash) == users.end())
             {

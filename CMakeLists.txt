@@ -16,7 +16,7 @@ include_directories(header/server header/client header src)
 protobuf_generate(TARGET protobuflib LANGUAGE cpp)
 protobuf_generate(TARGET protobuflib LANGUAGE grpc
 GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
-PLUGIN "protoc-gen-grpc=/usr/bin/grpc_cpp_plugin")
+PLUGIN "protoc-gen-grpc=${CMAKE_SOURCE_DIR}/third_party/grpc/build/grpc_cpp_plugin")
 
 set(SERVER_SOURCES
     src/server/main.cpp
