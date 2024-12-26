@@ -1,8 +1,13 @@
+#pragma once
+
 #include <string>
 #include <map>
 #include <chrono>
+#include <memory>
 
 #include "status.h"
+
+#include "ItokenGenerator.h"
 
 struct User
 {
@@ -13,63 +18,22 @@ struct User
 class CachedStorage
 {
     public:
-        ReturnStatus verifyUser(const std::string& email, size_t pwd)
-        {
-            auto iter = users.find(hasher(email));
-            if(iter != users.end())
-            {
-                if(pwd == iter->second)
-                {
-                    return Status_OK;
-                }
-            }
-            return Status_AuthError;
-        }
-        ReturnStatus registerUser(const User& usr) 
-        {
-            if(!isEmail(usr.email))
-            {
-                return Status_ValidationFailed;
-            }
-            size_t emailHash = hasher(usr.email);
-            if(users.find(emailHash) == users.end())
-            {
-                std::pair<size_t, size_t> newUser;
-                newUser.first = emailHash;
-                newUser.second = usr.pwd;
-                users.emplace(newUser);
-                return Status_OK;
-            }
-            return Status_AlreadyExist;
-        }
-        ReturnStatus createToken(const User& usr, std::chrono::minutes time, std::string& outToken)
-        {
-            return Status_OK;
-        }
+        CachedStorage(ItokenGenerator& tokenGenerator);
+        ReturnStatus verifyUser(const std::string& email, size_t pwd);
+        ReturnStatus verifyToken(const std::string& email, const std::string& token);
+        ReturnStatus registerUser(const User& usr);
+        ReturnStatus createToken(const std::string& email, std::chrono::minutes time, std::string& outToken);
     private:
 
-        bool isEmail(const std::string& input)
-        {
-            size_t at = input.find('@');
-            if (at == std::string::npos)
-            {
-                return false;
-            }
+        bool isEmail(const std::string& input);
 
-            size_t dot = input.find('.', at + 1);
-            if (dot == std::string::npos)
-            {
-                return false;
-            }
-
-            return true;
-        }
-        ReturnStatus createNewToken(const User& usr, std::chrono::minutes time, std::string& outToken)
-        {
-            return Status_OK;
-        }
         // first hash of email + hash of pwd -> second alive token
         std::map<std::string, std::string> cacheTokens;
         std::map<size_t, size_t> users;
+        std::map<size_t, std::string> tokens;
+
+        // replace with SHA256 + salt
         std::hash<std::string> hasher;
+
+        ItokenGenerator& m_tokenGenerator;
 };

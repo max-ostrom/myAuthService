@@ -1,3 +1,7 @@
+sudo apt update
+sudo apt install libboost-all-dev
+
+
 mkdir third_party
 cd third_party
 
@@ -12,7 +16,7 @@ cd build
 cmake ..
 make -j 4
 sudo make install
-
+cd ../../
 
 # json parser
 if [ ! -d "json" ]; then 
