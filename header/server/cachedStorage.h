@@ -8,20 +8,22 @@
 #include "status.h"
 
 #include "ItokenGenerator.h"
+#include "Ihasher.h"
 
 struct User
 {
     std::string email;
-    size_t pwd;
+    std::string pwd;
+    std::string salt;
 };
 
 class CachedStorage
 {
     public:
-        CachedStorage(ItokenGenerator& tokenGenerator);
-        ReturnStatus verifyUser(const std::string& email, size_t pwd);
+        CachedStorage(ItokenGenerator& tokenGenerator, IHasher& hasher);
+        ReturnStatus verifyUser(const std::string& email, const std::string& pwd);
         ReturnStatus verifyToken(const std::string& email, const std::string& token);
-        ReturnStatus registerUser(const User& usr);
+        ReturnStatus registerUser(const std::string& email, const std::string& pwd);
         ReturnStatus createToken(const std::string& email, std::chrono::minutes time, std::string& outToken);
     private:
 
@@ -29,11 +31,11 @@ class CachedStorage
 
         // first hash of email + hash of pwd -> second alive token
         std::map<std::string, std::string> cacheTokens;
-        std::map<size_t, size_t> users;
-        std::map<size_t, std::string> tokens;
+        std::map<std::string, User> users;
+        std::map<std::string, std::string> tokens;
 
         // replace with SHA256 + salt
-        std::hash<std::string> hasher;
+        IHasher& m_hasher;
 
         ItokenGenerator& m_tokenGenerator;
 };

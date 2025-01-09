@@ -2,6 +2,7 @@
 #include "configParser.h"
 #include "grpcAuthService.h"
 #include "tokenGenerator.h"
+#include "SHAHasher.h"
 
 #include <memory>
 
@@ -10,7 +11,8 @@
 void run(const std::string& cnfgPath)
 {
     TokenGenerator tokenGen(32);
-    CachedStorage strg(tokenGen);
+    SHAHasher hasher;
+    CachedStorage strg(tokenGen, hasher);
     GRPCAuthService authService(strg);
     grpc::ServerBuilder builder;
 
@@ -22,7 +24,7 @@ void run(const std::string& cnfgPath)
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
 
 
-    LOG << "pre wait" << std::endl;
+    LOG << "setup done" << std::endl;
     server->Wait();
     LOG << "started" << std::endl;
 }

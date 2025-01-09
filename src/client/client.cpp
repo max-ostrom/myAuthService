@@ -4,19 +4,17 @@
 #include "requestManager.h"
 #include "logger.h"
 #include "configParser.h"
+#include "SHAHasher.h"
 
 int main() {
     std::string pwd, email, action;
     std::cin >> action;
     std::cin >> email;
     std::cin >> pwd;
-    std::hash<std::string> hasher;
-    size_t pwdhash = hasher(pwd);
-
     RegisterData request;
     request.set_email(email);
-    request.set_pwd(pwdhash);
-    LOG << pwdhash << std::endl;
+    request.set_pwd(pwd);
+
     RegisterDataReply response;
 
     config cnfg = parserJson("config.json");

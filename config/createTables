@@ -1,0 +1,14 @@
+CREATE TABLE Users (
+    id BIGINT PRIMARY KEY,         -- Use BIGINT for size_t type (assuming it's 64-bit)
+    email VARCHAR(255) NOT NULL,   -- Use VARCHAR for strings
+    pwd VARCHAR(255) NOT NULL,     -- Password field as a string
+    salt VARCHAR(255) NOT NULL     -- Salt field as a string
+);
+
+CREATE TABLE Tokens (
+    user_id BIGINT,               -- This references the id from the Users table
+    token VARCHAR(255) NOT NULL,   -- Token field as a string
+    validUntil TIMESTAMP NOT NULL, -- Store validUntil as a TIMESTAMP for date-time
+    PRIMARY KEY (user_id, token), -- Composite key: (user_id, token) for uniqueness
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE -- Foreign key to Users table
+);

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
-project("gRPC Service")
+project("Auth Service")
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
@@ -7,6 +8,7 @@ find_package(PROTOBUF REQUIRED CONFIG)
 find_package(gRPC REQUIRED CONFIG) 
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(OpenSSL REQUIRED)
 
 add_library(protobuflib proto/service.proto)
 target_link_libraries(protobuflib gRPC::grpc++)
@@ -25,6 +27,8 @@ set(SERVER_HEADERS
     header/server/grpcAuthService.h
     header/server/ItokenGenerator.h
     header/server/tokenGenerator.h
+    header/server/Ihasher.h
+    header/server/SHAHasher.h
 )
 
 set(CLIENT_HEADERS
@@ -54,7 +58,7 @@ set(COMMON_SOURCES
 )
 
 add_executable(myServer ${SERVER_SOURCES} ${COMMON_SOURCES} ${SERVER_HEADERS} ${COMMON_HEADERS})
-target_link_libraries(myServer protobuflib nlohmann_json::nlohmann_json Boost::program_options)
+target_link_libraries(myServer protobuflib nlohmann_json::nlohmann_json Boost::program_options OpenSSL::SSL OpenSSL::Crypto)
 
 add_executable(myClient ${CLIENT_SOURCES} ${COMMON_SOURCES} ${CLIENT_HEADERS} ${COMMON_HEADERS})
 target_link_libraries(myClient protobuflib nlohmann_json::nlohmann_json)

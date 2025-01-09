@@ -4,8 +4,8 @@ GRPCAuthService::GRPCAuthService(CachedStorage& strg) : m_strg(strg){}
 
 ::grpc::Status GRPCAuthService::Register(::grpc::ServerContext* context, const ::RegisterData* request, ::RegisterDataReply* response) 
 {
-    LOG << "Register " << request->email() << " " << request->pwd() << std::endl;
-    auto status = m_strg.registerUser({request->email(),request->pwd()});
+    LOG << request->email() << " " << request->pwd() << std::endl;
+    auto status = m_strg.registerUser(request->email(),request->pwd());
     if(status == Status_AlreadyExist)
     {
         return grpc::Status(grpc::StatusCode::ALREADY_EXISTS, "exist");
@@ -19,7 +19,7 @@ GRPCAuthService::GRPCAuthService(CachedStorage& strg) : m_strg(strg){}
 
 ::grpc::Status GRPCAuthService::Login(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response)
 {
-    LOG << "Login" << std::endl;
+    LOG << std::endl;
     if(m_strg.verifyUser(request->email(),request->pwd()) == Status_OK)
     {
         std::string responseToken;
@@ -34,13 +34,13 @@ GRPCAuthService::GRPCAuthService(CachedStorage& strg) : m_strg(strg){}
 
 ::grpc::Status GRPCAuthService::ExtendTokenLifetime(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response)
 {
-    LOG << "ExtendTokenLifetime" << std::endl;
+    LOG << std::endl;
     return grpc::Status::OK;
 }
 
 ::grpc::Status GRPCAuthService::SendMsg(::grpc::ServerContext* context, const ::Message* request, ::ResponseData* response)
 {
-    LOG << "SendMsg" << std::endl;
+    LOG << std::endl;
     return grpc::Status::OK;
 }
   

@@ -1,13 +1,15 @@
 #include "cachedStorage.h"
+#include "logger.h"
 
-CachedStorage::CachedStorage(ItokenGenerator& tokenGenerator) : m_tokenGenerator(tokenGenerator){}
+CachedStorage::CachedStorage(ItokenGenerator& tokenGenerator, IHasher& hasher) :m_hasher(hasher), m_tokenGenerator(tokenGenerator){}
 
-ReturnStatus CachedStorage::verifyUser(const std::string& email, size_t pwd)
+ReturnStatus CachedStorage::verifyUser(const std::string& email, const std::string& pwd)
 {
-    auto iter = users.find(hasher(email));
+    auto iter = users.find(email);
     if(iter != users.end())
     {
-        if(pwd == iter->second)
+        LOG << m_hasher.hash(pwd + iter->second.salt) << std::endl;
+        if(m_hasher.hash(pwd + iter->second.salt) == iter->second.pwd)
         {
             return Status_OK;
         }
@@ -17,7 +19,7 @@ ReturnStatus CachedStorage::verifyUser(const std::string& email, size_t pwd)
 
 ReturnStatus CachedStorage::verifyToken(const std::string& email, const std::string& token)
 {
-    auto iter = tokens.find(hasher(email));
+    auto iter = tokens.find(email);
     if(iter != tokens.end())
     {
         if(token == iter->second)
@@ -28,18 +30,22 @@ ReturnStatus CachedStorage::verifyToken(const std::string& email, const std::str
     return Status_AuthError;
 }
 
-ReturnStatus CachedStorage::registerUser(const User& usr) 
+ReturnStatus CachedStorage::registerUser(const std::string& email, const std::string& pwd)
 {
-    if(!isEmail(usr.email))
+    if(!isEmail(email))
     {
         return Status_ValidationFailed;
     }
-    size_t emailHash = hasher(usr.email);
-    if(users.find(emailHash) == users.end())
+
+    if(users.find(email) == users.end())
     {
-        std::pair<size_t, size_t> newUser;
-        newUser.first = emailHash;
-        newUser.second = usr.pwd;
+        std::pair<std::string, User> newUser;
+        newUser.first = email;
+        User userToRegister;
+        userToRegister.email = email;
+        userToRegister.salt = m_tokenGenerator.generateToken();
+        userToRegister.pwd = m_hasher.hash(pwd + userToRegister.salt);
+        newUser.second = userToRegister;
         users.emplace(newUser);
         return Status_OK;
     }
@@ -48,8 +54,7 @@ ReturnStatus CachedStorage::registerUser(const User& usr)
 
 ReturnStatus CachedStorage::createToken(const std::string& email, std::chrono::minutes time, std::string& outToken)
 {
-    auto emailHash = hasher(email);
-    auto existingTokenIter = tokens.find(emailHash);
+    auto existingTokenIter = tokens.find(email);
     if(existingTokenIter != tokens.end())
     {
         std::string newToken = m_tokenGenerator.generateToken();
@@ -60,7 +65,7 @@ ReturnStatus CachedStorage::createToken(const std::string& email, std::chrono::m
     {
         std::string newToken = m_tokenGenerator.generateToken();
         outToken = newToken;
-        tokens[emailHash] =newToken;
+        tokens[email] = newToken;
     }
     return Status_OK;
 }

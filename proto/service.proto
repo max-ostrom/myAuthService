@@ -8,7 +8,7 @@ message ResponseData
 
 message RegisterData {
   string email = 1;
-  uint64 pwd = 2;
+  string pwd = 2;
 }
 
 message RegisterDataReply {
