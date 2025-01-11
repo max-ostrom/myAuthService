@@ -1,4 +1,4 @@
-#include "requestManager.h"
+#include "requestmanager.h"
 
 ReturnStatus GRPCRequestManager::Connect()
 {

@@ -6,13 +6,13 @@
 #include <proto/service.pb.h>
 #include <proto/service.grpc.pb.h>
 
-#include "cachedStorage.h"
+#include "cachedstorage.h"
 #include "logger.h"
 
-class GRPCAuthService : public Auth::Service
+class GRPCAuthServiceImpl : public Auth::Service
 {
     public:
-        GRPCAuthService(CachedStorage& strg);
+        GRPCAuthServiceImpl(CachedStorage& strg);
         ::grpc::Status Register(::grpc::ServerContext* context, const ::RegisterData* request, ::RegisterDataReply* response);
         ::grpc::Status Login(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response);
         ::grpc::Status ExtendTokenLifetime(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response);

@@ -1,31 +1,18 @@
 
-#include "configParser.h"
-#include "grpcAuthService.h"
-#include "tokenGenerator.h"
-#include "SHAHasher.h"
+#include "grpcservicefactory.h"
 
 #include <memory>
 
 #include <boost/program_options.hpp>
 
-void run(const std::string& cnfgPath)
+void buildAndRun(size_t port,
+    AuthService::ServiceProtocol protocol,
+    AuthService::ProtocolEncryption encryption,
+    AuthService::HashAlgorithm hasher)
 {
-    TokenGenerator tokenGen(32);
-    SHAHasher hasher;
-    CachedStorage strg(tokenGen, hasher);
-    GRPCAuthService authService(strg);
-    grpc::ServerBuilder builder;
-
-    config cnfg = parserJson(cnfgPath);
-    std::string endpoint = "0.0.0.0:" + std::to_string(cnfg.port);
-
-    builder.AddListeningPort(endpoint, grpc::InsecureServerCredentials());
-    builder.RegisterService(&authService);
-    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-
-
-    LOG << "setup done" << std::endl;
-    server->Wait();
+    AuthServiceFactory factory;
+    auto service = factory.Build(port, protocol, encryption, hasher);
+    service->run();
     LOG << "started" << std::endl;
 }
 
@@ -34,7 +21,11 @@ int main(int argc, char* argv[]) {
     desc.add_options()
         ("help", "Produce help message")
         ("verbose,v", "Enable verbose output")
-        ("cnfgfile,f", boost::program_options::value<std::string>()->default_value("config.json"), "Config file path");
+        ("type,t", boost::program_options::value<int>()->default_value(0), "Service protocol type: 0)gRPC(default) or 1)RESTAPI")
+        ("port,p", boost::program_options::value<size_t>()->default_value(45554), "Service port")
+        ("security,s", boost::program_options::value<int>()->default_value(0), "Service encryption data: 0)Insecure(default)")
+        ("hash,hs", boost::program_options::value<int>()->default_value(0),"Hashing algorithm for passwords: 0)SHA256")
+        ("roles,r", "Enables roles for users");
 
     boost::program_options::variables_map vm;
     try {
@@ -45,10 +36,36 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+//getting args
     if (vm.count("help")) {
         LOG << desc << std::endl;
         return 0;
     }
-    run(vm["cnfgfile"].as<std::string>());
+    size_t port = 0;
+    AuthService::ServiceProtocol protocol = AuthService::ServiceProtocol::gRPC;
+    AuthService::ProtocolEncryption encryption = AuthService::ProtocolEncryption::Insecure;
+    AuthService::HashAlgorithm hasher = AuthService::HashAlgorithm::SHA256;
+    if(vm.count("type"))
+    {
+        protocol = AuthService::convertServiceProtocol(vm["type"].as<int>());
+    }
+    if(vm.count("port"))
+    {
+        port = vm["port"].as<size_t>();
+    }
+    if(vm.count("security"))
+    {
+        encryption = AuthService::convertProtocolEncryption(vm["security"].as<int>());
+    }
+    if(vm.count("hash"))
+    {
+        hasher = AuthService::convertHashAlgorithm(vm["hash"].as<int>());
+    }
+
+//build and run service
+    buildAndRun(port, protocol, encryption, hasher);
+
+
     return 0;
 }

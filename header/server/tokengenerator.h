@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ItokenGenerator.h"
+#include "itokengenerator.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-class TokenGenerator : public ItokenGenerator
+class TokenGenerator : public ITokenGenerator
 {
 private:
     int m_tokenLenght;
@@ -19,5 +19,4 @@ public:
             boost::uuids::uuid u = generator();
             return boost::uuids::to_string(u);
     }
-    ~TokenGenerator() = default;
 };

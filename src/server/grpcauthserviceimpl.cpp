@@ -1,8 +1,8 @@
-#include "grpcAuthService.h"
+#include "grpcauthserviceimpl.h"
 
-GRPCAuthService::GRPCAuthService(CachedStorage& strg) : m_strg(strg){}
+GRPCAuthServiceImpl::GRPCAuthServiceImpl(CachedStorage& strg) : m_strg(strg){}
 
-::grpc::Status GRPCAuthService::Register(::grpc::ServerContext* context, const ::RegisterData* request, ::RegisterDataReply* response) 
+::grpc::Status GRPCAuthServiceImpl::Register(::grpc::ServerContext* context, const ::RegisterData* request, ::RegisterDataReply* response) 
 {
     LOG << request->email() << " " << request->pwd() << std::endl;
     auto status = m_strg.registerUser(request->email(),request->pwd());
@@ -17,7 +17,7 @@ GRPCAuthService::GRPCAuthService(CachedStorage& strg) : m_strg(strg){}
     return grpc::Status::OK;
 }
 
-::grpc::Status GRPCAuthService::Login(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response)
+::grpc::Status GRPCAuthServiceImpl::Login(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response)
 {
     LOG << std::endl;
     if(m_strg.verifyUser(request->email(),request->pwd()) == Status_OK)
@@ -32,13 +32,13 @@ GRPCAuthService::GRPCAuthService(CachedStorage& strg) : m_strg(strg){}
     return grpc::Status(grpc::StatusCode::UNAUTHENTICATED, "failed");
 }
 
-::grpc::Status GRPCAuthService::ExtendTokenLifetime(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response)
+::grpc::Status GRPCAuthServiceImpl::ExtendTokenLifetime(::grpc::ServerContext* context, const ::RegisterData* request, ::TokenResponse* response)
 {
     LOG << std::endl;
     return grpc::Status::OK;
 }
 
-::grpc::Status GRPCAuthService::SendMsg(::grpc::ServerContext* context, const ::Message* request, ::ResponseData* response)
+::grpc::Status GRPCAuthServiceImpl::SendMsg(::grpc::ServerContext* context, const ::Message* request, ::ResponseData* response)
 {
     LOG << std::endl;
     return grpc::Status::OK;

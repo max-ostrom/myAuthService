@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ihasher.h"
+#include "ihasher.h"
 
 #include <sstream>
 #include <iomanip>
@@ -9,12 +9,7 @@
 
 class SHAHasher : public IHasher    
 {
-private:
 public:
-    SHAHasher()
-    {
-
-    }
     virtual std::string hash(const std::string& strToHash, size_t size = EVP_MAX_MD_SIZE) override
     {
         EVP_MD_CTX* mdctx = EVP_MD_CTX_new(); // Create a new context for the hash operation
@@ -37,10 +32,10 @@ public:
             // clarify does unsigned char & char same or not...
             // Convert the hash to a hexadecimal string
         std::stringstream ss;
-        for (unsigned int i = 0; i < length; ++i) {
-        ss << std::setw(2) << std::setfill('0') << std::hex << (int)hash[i];
+        for (unsigned int i = 0; i < length; ++i) 
+        {
+            ss << std::setw(2) << std::setfill('0') << std::hex << (int)hash[i];
+        }
+        return ss.str();
     }
-    return ss.str();
-    }
-    ~SHAHasher() = default;
 };

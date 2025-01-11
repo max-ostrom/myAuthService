@@ -18,14 +18,3 @@ cmake ..
 make -j 4
 sudo make install
 cd ../../
-
-# json parser
-if [ ! -d "json" ]; then 
-    git clone https://github.com/nlohmann/json.git
-fi
-cd json
-mkdir build
-cd build
-cmake ..
-make -j 4
-sudo make install

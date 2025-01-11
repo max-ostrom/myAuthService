@@ -6,7 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(PROTOBUF REQUIRED CONFIG)
 find_package(gRPC REQUIRED CONFIG) 
-find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(OpenSSL REQUIRED)
 
@@ -22,49 +21,45 @@ GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
 PLUGIN "protoc-gen-grpc=${CMAKE_SOURCE_DIR}/third_party/grpc/build/grpc_cpp_plugin")
 
 set(SERVER_HEADERS
-    header/dataProvider/IDataProvider.h
-    header/server/cachedStorage.h
-    header/server/grpcAuthService.h
-    header/server/ItokenGenerator.h
-    header/server/tokenGenerator.h
-    header/server/Ihasher.h
-    header/server/SHAHasher.h
+    header/dataProvider/idataprovider.h
+    header/server/cachedstorage.h
+    header/server/grpcauthserviceimpl.h
+    header/server/itokengenerator.h
+    header/server/tokengenerator.h
+    header/server/ihasher.h
+    header/server/shahasher.h
 )
 
 set(CLIENT_HEADERS
-    header/client/IRequestManager.h
-    header/client/requestManager.h
+    header/client/irequestmanager.h
+    header/client/requestmanager.h
 )
 
 set(COMMON_HEADERS
     header/status.h
     header/logger.h
-    header/configParser.h
 )
 
 set(SERVER_SOURCES
     src/server/main.cpp
-    src/server/cachedStorage.cpp
-    src/server/grpcAuthService.cpp
+    src/server/cachedstorage.cpp
+    src/server/grpcauthserviceimpl.cpp
 )
 
 set(CLIENT_SOURCES 
     src/client/client.cpp
-    src/client/requestManager.cpp
+    src/client/requestmanager.cpp
 )
 
 set(COMMON_SOURCES 
-    src/configParser.cpp
+    
 )
 
-add_executable(myServer ${SERVER_SOURCES} ${COMMON_SOURCES} ${SERVER_HEADERS} ${COMMON_HEADERS})
-target_link_libraries(myServer protobuflib nlohmann_json::nlohmann_json Boost::program_options OpenSSL::SSL OpenSSL::Crypto)
+add_executable(AuthService ${SERVER_SOURCES} ${COMMON_SOURCES} ${SERVER_HEADERS} ${COMMON_HEADERS})
+target_link_libraries(AuthService protobuflib Boost::program_options OpenSSL::SSL OpenSSL::Crypto)
 
-add_executable(myClient ${CLIENT_SOURCES} ${COMMON_SOURCES} ${CLIENT_HEADERS} ${COMMON_HEADERS})
-target_link_libraries(myClient protobuflib nlohmann_json::nlohmann_json)
-
-add_custom_command(TARGET myServer POST_BUILD
-    COMMAND cp ${CMAKE_SOURCE_DIR}/config/config.json ${CMAKE_CURRENT_BINARY_DIR}
-)
+add_executable(testClient ${CLIENT_SOURCES} ${COMMON_SOURCES} ${CLIENT_HEADERS} ${COMMON_HEADERS})
+target_link_libraries(testClient protobuflib)
 
 # make installer
+# make lite version without boost & json

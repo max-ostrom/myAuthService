@@ -2,9 +2,9 @@
 
 #include <string>
 
-class ItokenGenerator
+class ITokenGenerator
 {
 public:
     virtual std::string generateToken() = 0;
-    virtual ~ItokenGenerator(){}
+    virtual ~ITokenGenerator(){}
 };

@@ -1,0 +1,10 @@
+#1 make secure channel for grpc 
+#2 make factory to build auth service -- done
+#3 create static lib for client
+#4 test client should use clientlib
+#5 database
+#6 RESTAPI option
+#7 double check usage of json parser & config -- done
+#8 register daemon
+
+#... auth service over docker

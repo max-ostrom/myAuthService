@@ -1,10 +1,8 @@
 #include <algorithm>
 #include <functional>
 
-#include "requestManager.h"
+#include "requestmanager.h"
 #include "logger.h"
-#include "configParser.h"
-#include "SHAHasher.h"
 
 int main() {
     std::string pwd, email, action;
@@ -17,8 +15,7 @@ int main() {
 
     RegisterDataReply response;
 
-    config cnfg = parserJson("config.json");
-    std::string endpoint = "localhost:" + std::to_string(cnfg.port);
+    std::string endpoint = "localhost:45002";
     GRPCRequestManager manager(endpoint);
     if(action == "r")
     {  

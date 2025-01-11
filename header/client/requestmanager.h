@@ -1,4 +1,4 @@
-#include "IRequestManager.h"
+#include "irequestmanager.h"
 
 #include <memory>
 #include <string>
@@ -19,7 +19,6 @@ public:
         m_channel = grpc::CreateChannel(m_serverAddress, grpc::InsecureChannelCredentials());
         m_auth = Auth::NewStub(m_channel);
     }
-    ~GRPCRequestManager() {}
 
     virtual ReturnStatus Connect() override;
     virtual ReturnStatus Register(const RegisterData& in, RegisterDataReply& out) override;
